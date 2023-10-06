@@ -1,0 +1,57 @@
+service: sotftek-serverless
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: 'us-east-1'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-1:981921364257:table/StarWarsTable
+
+functions:
+  api:
+    handler: src/index.healthCheck
+    events:
+      - httpApi:
+          path: /
+          method: get
+  getJedi:
+    handler: src/getJedi.getJedi
+    events:
+      - httpApi:
+          path: /obtenerJedi
+          method: get
+  createPeruvianJedi:
+    handler: src/createPeruvianJedi.addPeruvianJedi
+    events:
+      - httpApi:
+          path: /crearJediPeruano
+          method: post
+  getPeruvianJedis:
+    handler: src/getPeruvianJedis.getPeruvianJedis
+    events:
+      - httpApi:
+          path: /obtenerJedisPeruanos
+          method: get
+
+resources:
+  Resources:
+    StarWarsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: StarWarsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+
+plugins:
+  - serverless-auto-swagger
